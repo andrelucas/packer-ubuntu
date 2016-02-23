@@ -1,10 +1,10 @@
 {
   "variables": {
-    "name": "trusty-sever",
+    "name": "trusty-desktop",
     "os_version": "14.04.4",
-    "local_iso": "../iso/ubuntu-14.04.4-server-amd64.iso",
-    "upstream_iso": "http://releases.ubuntu.com/14.04/ubuntu-14.04.4-server-amd64.iso",
-    "iso_checksum": "07e4bb5569814eab41fafac882ba127893e3ff0bdb7ec931c9b2d040e3e94e7a",
+    "local_iso": "../iso/ubuntu-14.04.4-desktop-amd64.iso",
+    "upstream_iso": "http://releases.ubuntu.com/14.04/ubuntu-14.04.4-desktop-amd64.iso",
+    "iso_checksum": "7d9337e7b19d74b197100035ffa4318999e2d6a875bba020cfe197faeb98e904",
     "checksum_algo": "sha256",
     "headless": "true",
     "disk_size": "102400",
