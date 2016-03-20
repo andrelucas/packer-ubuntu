@@ -8,6 +8,8 @@
     "checksum_algo": "sha256",
     "headless": "true",
     "disk_size": "102400",
+    "vm_ncpu": "2",
+    "vm_mem": "2048",
     "version": "0.1.1"
   },
   "builders": [
@@ -46,8 +48,8 @@
       "vm_name": "packer-{{user `name`}}-{{user `os_version`}}-amd64-vmware",
       "vmx_data": {
         "cpuid.coresPerSocket": "1",
-        "memsize": "2048",
-        "numvcpus": "2"
+        "memsize": "{{user `vm_mem`}}",
+        "numvcpus": "{{user `vm_ncpu`}}"
       }
     },
     {
@@ -84,8 +86,8 @@
       "ssh_wait_timeout": "10000s",
       "vm_name": "packer-{{user `name`}}-{{user `os_version`}}-amd64",
       "vboxmanage": [
-        ["modifyvm", "{{.Name}}", "--memory", "2048"],
-        ["modifyvm", "{{.Name}}", "--cpus", "2"]
+        ["modifyvm", "{{.Name}}", "--memory", "{{user `vm_mem`}}"],
+        ["modifyvm", "{{.Name}}", "--cpus", "{{user `vm_ncpu`}}"]
       ]
     }
   ],
