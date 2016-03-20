@@ -1,4 +1,5 @@
 packer_cache/
 packer-*-vbox/
+packer-*-vmware/
 packer*.box
 
