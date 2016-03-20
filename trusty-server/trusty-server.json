@@ -1,6 +1,6 @@
 {
   "variables": {
-    "name": "trusty-sever",
+    "name": "trusty-server",
     "os_version": "14.04.4",
     "local_iso": "../iso/ubuntu-14.04.4-server-amd64.iso",
     "upstream_iso": "http://releases.ubuntu.com/14.04/ubuntu-14.04.4-server-amd64.iso",
