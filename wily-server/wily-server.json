@@ -8,6 +8,9 @@
     "checksum_algo": "sha256",
     "headless": "true",
     "disk_size": "102400",
+    "ssh_fullname": "Vagrant user",
+    "ssh_username": "vagrant",
+    "ssh_password": "vagrant",
     "vm_ncpu": "2",
     "vm_mem": "2048",
     "version": "0.1.1"
@@ -26,8 +29,11 @@
         " auto=true",
         " priority=critical",
         " initrd=/install/initrd.gz",
-        " noapic",
         " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+        " passwd/user-fullname={{user `ssh_fullname`}}",
+        " passwd/username={{user `ssh_username`}}",
+        " passwd/user-password={{user `ssh_password`}}",
+        " passwd/user-password-again={{user `ssh_password`}}",
         " -- ",
         "<enter>"
       ],
@@ -71,6 +77,10 @@
         " initrd=/install/initrd.gz",
         " noapic",
         " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+        " passwd/user-fullname={{user `ssh_fullname`}}",
+        " passwd/username={{user `ssh_username`}}",
+        " passwd/user-password={{user `ssh_password`}}",
+        " passwd/user-password-again={{user `ssh_password`}}",
         " -- ",
         "<enter>"
       ],
