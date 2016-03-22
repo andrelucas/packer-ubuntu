@@ -1,0 +1,159 @@
+{
+  "variables": {
+    "name": "xenial-server",
+    "os_version": "16.04",
+    "local_iso": "../iso/xenial-server-amd64.iso",
+    "upstream_iso": "http://releases.ubuntu.com/16.10/xenial-server-amd64.iso",
+    "iso_checksum": "36ae0090de5ac887f6c9b9bc0975b1954c02850a628ff1791f94f95b258373b3",
+    "checksum_algo": "sha256",
+    "headless": "true",
+    "disk_size": "102400",
+    "vm_ncpu": "2",
+    "vm_mem": "2048",
+    "version": "0.1.1"
+  },
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "boot_command": [
+        "<enter><wait><f6><esc>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs>",
+        "/install/vmlinuz",
+        " auto=true",
+        " priority=critical",
+        " initrd=/install/initrd.gz",
+        " noapic",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+        " -- ",
+        "<enter>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": "{{user `disk_size`}}",
+      "guest_os_type": "ubuntu-64",
+      "headless": "{{user `headless`}}",
+      "http_directory": "http",
+      "iso_urls": [
+        "{{user `local_iso`}}",
+        "{{user `upstream_iso`}}"
+      ],
+      "iso_checksum_type": "{{user `checksum_algo`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "output_directory": "packer-{{user `name`}}-{{user `os_version`}}-amd64-vmware",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_username": "vagrant",
+      "ssh_wait_timeout": "10000s",
+      "tools_upload_flavor": "linux",
+      "vm_name": "packer-{{user `name`}}-{{user `os_version`}}-amd64-vmware",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "memsize": "{{user `vm_mem`}}",
+        "numvcpus": "{{user `vm_ncpu`}}"
+      }
+    },
+    {
+      "type": "virtualbox-iso",
+      "boot_command": [
+        "<enter><wait><f6><esc>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs>",
+        "/install/vmlinuz",
+        " auto=true",
+        " priority=critical",
+        " initrd=/install/initrd.gz",
+        " noapic",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+        " -- ",
+        "<enter>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": "{{user `disk_size`}}",
+      "guest_additions_mode": "upload",
+      "guest_os_type": "Ubuntu_64",
+      "headless": "{{user `headless`}}",
+      "http_directory": "http",
+      "iso_urls": [
+        "{{user `local_iso`}}",
+        "{{user `upstream_iso`}}"
+      ],
+      "iso_checksum_type": "{{user `checksum_algo`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "output_directory": "packer-{{user `name`}}-{{user `os_version`}}-amd64-vbox",
+      "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_username": "vagrant",
+      "ssh_wait_timeout": "10000s",
+      "vm_name": "packer-{{user `name`}}-{{user `os_version`}}-amd64",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "{{user `vm_mem`}}"],
+        ["modifyvm", "{{.Name}}", "--cpus", "{{user `vm_ncpu`}}"]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "../script/01-sudo_vagrant.sh",
+      "execute_command": "echo 'vagrant' | sudo -S bash {{.Path}}",
+      "pause_before": "3s"
+    },
+    {
+      "type": "shell",
+      "script": "../script/05-insecure_key.sh",
+      "execute_command": "sudo {{.Path}}",
+      "pause_before": "3s"
+    },
+    {
+      "type" :"shell",
+      "script": "../script/debupdate.sh",
+      "execute_command": "sudo {{.Path}}",
+      "pause_before": "3s"
+    },
+    {
+      "type": "shell",
+      "execute_command": "sudo {{.Path}}",
+      "inline": ["sudo reboot; sleep 60"]
+    },
+    {
+      "type": "shell",
+      "script": "../script/vmware-tools.sh",
+      "pause_before": "3s",
+      "execute_command": "sudo {{.Path}}",
+      "only": ["vmware-iso"]
+    },
+    {
+      "type": "shell",
+      "execute_command": "sudo {{.Path}}",
+      "inline": ["sudo reboot; sleep 60"],
+      "only": ["vmware-iso"]
+    },
+    {
+      "type": "shell",
+      "execute_command": "sudo {{.Path}}",
+      "inline": ["sleep 60"],
+      "only": ["vmware-iso"]
+    },
+    {
+      "type": "shell",
+      "script": "../script/vbox-guest-additions.sh",
+      "pause_before": "3s",
+      "execute_command": "sudo {{.Path}}",
+      "only": ["virtualbox-iso"]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true
+    }
+  ]
+}
